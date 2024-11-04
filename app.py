@@ -327,7 +327,12 @@ def main():
         st.image('atual.png')
         
         st.markdown("### Próximos 12 meses")
-        algoritmo = st.radio("Método  ",['Prophet', 'Xgboost',  'Ambos'], caption=['a','b','c'], horizontal = True)
+        algoritmo = st.radio("Método  ",['Prophet', 'Xgboost',  'Ambos'], 
+        captions=[
+        "criança",
+        "adolescente",
+        "adulto",
+    ], horizontal = True)
         intervalo = 12
         
         if st.button("Executar a previsão"):
