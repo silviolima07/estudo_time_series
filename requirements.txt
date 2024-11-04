@@ -1,5 +1,5 @@
 matplotlib
-Pillow==8.4.0
+Pillow==11.0.0
 seaborn
 streamlit
 prophet==1.1.2
