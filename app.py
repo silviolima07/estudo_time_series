@@ -19,7 +19,7 @@ from xgboost import XGBRegressor
 from sklearn.model_selection import TimeSeriesSplit
 from sklearn.metrics import mean_squared_error
 import numpy as np
-np.float_ = np.float64
+#np.float_ = np.float64
 
 
 file = 'Consumo x Previsão.xlsx'
