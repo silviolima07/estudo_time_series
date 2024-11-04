@@ -354,7 +354,7 @@ def main():
                        # Exemplo de uso para prever os próximos 12 meses
                        predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
                        plot_xgboost(df_xgb, predicoes_12_meses)
-                 else:
+                   else:
                        forecast,model, df = predict3(temp, intervalo)
                        st.markdown('### Prophet')
                        save_plot2(df, descricao, forecast,model, intervalo)
