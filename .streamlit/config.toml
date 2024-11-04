@@ -1,0 +1,15 @@
+# Max size, in megabytes, for files uploaded with the file_uploader.
+# Default: 200
+#maxUploadSize = 500
+#[server]
+#headless = true
+#[theme]
+#primaryColor="#F63366"
+#backgroundColor="#FFFFFF"
+#secondaryBackgroundColor="#F0F2F6"
+#textColor="#262730"
+#font="sans serif"
+[theme]
+base="light"
+primaryColor="#4b64ff"
+secondaryBackgroundColor="#f7b936"
