@@ -329,9 +329,9 @@ def main():
         st.markdown("### Próximos 12 meses")
         algoritmo = st.radio("Método  ",['Prophet', 'Xgboost',  'Ambos'], 
         captions=[
-        "criança",
-        "adolescente",
-        "adulto",
+        "rápido",
+        "demorado",
+        "processa ambos métodos",
     ], horizontal = True)
         intervalo = 12
         
