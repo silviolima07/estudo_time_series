@@ -315,7 +315,7 @@ def main():
         #symbol, description,forecast,model = predict3(option)
         temp = df_melted.loc[df_melted['Descrição']== descricao]
         st.write("Quantidade de Vendas:", temp.shape[0])
-        st.table(temp)
+        #st.table(temp)
         # Cria o gráfico e salva como 'atual.png'
         fig, ax = plt.subplots()
         temp.plot(x='mes-ano', y='valor', ax=ax)
@@ -327,7 +327,7 @@ def main():
         st.image('atual.png')
         
         st.markdown("### Próximos 12 meses")
-        #intervalo = st.radio("Meses  ",[1,3,6,9,12], horizontal = True)
+        algoritmo = st.radio("Método  ",['Prophet', 'Xgboost'], horizontal = True)
         intervalo = 12
         
         if st.button("Executar a previsão"):
@@ -335,21 +335,24 @@ def main():
                #symbol, description,forecast,model = predict2(option)
                #save_plot(symbol, description,forecast,model)
                with st.spinner('Aguarde o processamento...'):
+               
+                   if algoritmo == 'Prophet':
                    
-                   forecast,model, df = predict3(temp, intervalo)
-                   st.markdown('### Prophet')
-                   save_plot2(df, descricao, forecast,model, intervalo)
+                       forecast,model, df = predict3(temp, intervalo)
+                       st.markdown('### Prophet')
+                       save_plot2(df, descricao, forecast,model, intervalo)
+                   else:
+                       
+                       st.markdown('### Xgboost')
+                       # Training model
+                       #st.write('Training xgboost')
+                       df_xgb, model = training_xgboost(temp)
                    
-                   st.markdown('### Xgboost')
-                   # Training model
-                   #st.write('Training xgboost')
-                   df_xgb, model = training_xgboost(temp)
-                   
-                   #st.write(model)
-                   #st.table(df_xgb)
-                   # Exemplo de uso para prever os próximos 12 meses
-                   predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
-                   plot_xgboost(df_xgb, predicoes_12_meses)
+                       #st.write(model)
+                       #st.table(df_xgb)
+                       # Exemplo de uso para prever os próximos 12 meses
+                       predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
+                       plot_xgboost(df_xgb, predicoes_12_meses)
             except:
                st.write("Error descriçao: "+descricao)
                st.error('Checar.', icon="🚨")
