@@ -1,6 +1,6 @@
 matplotlib
-Pillow==11.0.0
+Pillow==10.4.0
 seaborn
-streamlit
+streamlit==1.39.0
 prophet==1.1.2
 holidays==0.24
