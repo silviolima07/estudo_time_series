@@ -21,6 +21,7 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 #np.float_ = np.float64
 
+#import pmdarima as pm
 
 import openpyxl
 file = 'Consumo x Previsão.xlsx'
@@ -355,9 +356,12 @@ def main():
                        df_xgb, model = training_xgboost(temp)
                    
                        #st.write(model)
-                       #st.table(df_xgb)
+                       
                        # Exemplo de uso para prever os próximos 12 meses
                        predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
+                       
+                       st.table(predicoes_12_meses)
+                       
                        plot_xgboost(df_xgb, predicoes_12_meses)
                    else:
                        forecast,model, df = predict3(temp, intervalo)
