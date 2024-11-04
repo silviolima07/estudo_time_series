@@ -346,6 +346,9 @@ def main():
                    
                        forecast,model, df = predict3(temp, intervalo)
                        st.markdown('### Prophet')
+                       
+                       st.table(forecast)
+                       
                        save_plot2(df, descricao, forecast,model, intervalo)
                    
                    elif algoritmo == 'Xgboost':
