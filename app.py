@@ -16,8 +16,8 @@ from prophet import Prophet
 
 import pandas as pd
 from xgboost import XGBRegressor
-from sklearn.model_selection import TimeSeriesSplit
-from sklearn.metrics import mean_squared_error
+from scikit-learn.model_selection import TimeSeriesSplit
+from scikit-learn.metrics import mean_squared_error
 import numpy as np
 #np.float_ = np.float64
 
