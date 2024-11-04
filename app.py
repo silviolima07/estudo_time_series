@@ -315,7 +315,7 @@ def main():
         #symbol, description,forecast,model = predict3(option)
         temp = df_melted.loc[df_melted['Descrição']== descricao]
         st.write("Quantidade de Vendas:", temp.shape[0])
-        #st.table(temp)
+        st.table(temp)
         # Cria o gráfico e salva como 'atual.png'
         fig, ax = plt.subplots()
         temp.plot(x='mes-ano', y='valor', ax=ax)
