@@ -4,3 +4,4 @@ seaborn
 streamlit==1.39.0
 prophet==1.1.2
 holidays==0.24
+setuptools
