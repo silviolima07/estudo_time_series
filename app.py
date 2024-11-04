@@ -285,11 +285,29 @@ def main():
     choice = st.sidebar.radio("Home",activities)
     
     if choice == 'Predictions':
-        uploaded_file = st.file_uploader("Escolha um arquivo XLS", type="xlsx")
+        uploaded_files = st.file_uploader("Escolha até 4 arquivo XLS", type=["xlsx"], accept_multiple_files=True, key="xlsx_files")
+        
+        if uploaded_files:
+            # Lista para armazenar cada DataFrame carregado
+            dataframes = []
 
-        if uploaded_file is not None:
+            # Loop para processar cada arquivo carregado
+            for uploaded_file in uploaded_files[:4]:  # Limita a 4 arquivos
+                df = pd.read_excel(uploaded_file)  # Lê o arquivo como um DataFrame
+                dataframes.append(df)  # Adiciona o DataFrame à lista
+                st.write(f"Exibindo dados do arquivo: {uploaded_file.name}")
+                st.dataframe(df)  # Mostra o conteúdo do arquivo carregado
+
+            # Concatena todos os DataFrames em um só
+            consolidated_df = pd.concat(dataframes, ignore_index=True)
+    
+            st.write("Planilha Consolidada:")
+            st.dataframe(consolidated_df)  # Mostra o DataFrame consolidado
+
+        #if uploaded_file is not None:
             # Ler o arquivo XLS
-            df = pd.read_excel(uploaded_file)
+            #df = pd.read_excel(uploaded_file)
+            df = consolidated_df
 
             # Filtra as colunas de data
             date_columns = [col for col in df.columns if isinstance(col, datetime.datetime)]
