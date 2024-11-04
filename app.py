@@ -21,39 +21,16 @@ from sklearn.metrics import mean_squared_error
 import numpy as np
 #np.float_ = np.float64
 
-#import pmdarima as pm
+import pmdarima as pm
 
 import openpyxl
-file = 'Consumo x Previsão.xlsx'
-df = pd.read_excel(file)
+#file = 'Consumo x Previsão.xlsx'
+#df = pd.read_excel(file)
 
-# Filtra as colunas de data
-date_columns = [col for col in df.columns if isinstance(col, datetime.datetime)]
-
-# Filtra as colunas de data
-date_columns = [col for col in df.columns if isinstance(col, datetime.datetime)]
-
-# Converte o DataFrame para o formato longo (long format) para reorganizar as colunas de data
-df_melted = df.melt(id_vars=[col for col in df.columns if col not in date_columns],
-                    value_vars=date_columns,
-                    var_name='mes-ano', value_name='valor')
-
-# Convert 'mes-ano' column to datetime objects
-df_melted['mes-ano'] = pd.to_datetime(df_melted['mes-ano'])
-
-# Now you can use .dt.strftime
-df_melted['mes-ano'] = df_melted['mes-ano'].dt.strftime('%Y-%m')
-
-df_melted.dropna(inplace=True)
-
-descricoes = df_melted['Descrição'].to_list()
-codigos    = df_melted['Código'].to_list()
-#st.write('Criar dicionario descricao:codigo')
-# Cria o dicionário
-descricao_para_codigo = dict(zip(descricoes, codigos))
-#st.write(descricao_para_codigo)
-# Exemplo de uso
-#print(descricao_para_codigo["Produto A"])  # Saída: 101
+# Carregar o arquivo XLS
+    #st.write(descricao_para_codigo)
+    # Exemplo de uso
+    #print(descricao_para_codigo["Produto A"])  # Saída: 101
 
 def forecast_xgboost(model, df, steps=12):
     """
@@ -268,14 +245,14 @@ def save_plot2(df, descricao, forecast,model, intervalo):
 
 
 
-def predict3(temp, intervalo):
+def predict3(temp, intervalo, sazonality):
   df = pd.DataFrame()
   df['ds'] = pd.to_datetime(temp['mes-ano'])  # Coluna de datas mensais
   df['y'] = temp['valor']  # Coluna de valores
   df = df.sort_values(by='ds')
  
   # Criar e treinar o modelo Prophet com sazonalidade anual
-  model = Prophet(daily_seasonality=False, yearly_seasonality=True) #, seasonality_mode='additive') # intervalo de confiança igual a 80%, para alterar: interval_width=0.95
+  model = Prophet(daily_seasonality=False, yearly_seasonality=sazonality) #, seasonality_mode='additive') # intervalo de confiança igual a 80%, para alterar: interval_width=0.95
   #model.add_seasonality(name='annual', period=365.25, fourier_order=3)
   # Treinamento do modelo
   model.fit(df)
@@ -308,85 +285,148 @@ def main():
     choice = st.sidebar.radio("Home",activities)
     
     if choice == 'Predictions':
-        #predict('TAEE4.SA') 
-        st.markdown("### Escolha um produto / Descrição")
-        descricao = st.selectbox('Descricao',descricoes, label_visibility = 'hidden')
-        st.write('Código:', descricao_para_codigo[descricao])
-        
-        #symbol, description,forecast,model = predict3(option)
-        temp = df_melted.loc[df_melted['Descrição']== descricao]
-        st.write("Quantidade de Vendas:", temp.shape[0])
-        st.table(temp)
-        # Cria o gráfico e salva como 'atual.png'
-        fig, ax = plt.subplots()
-        temp.plot(x='mes-ano', y='valor', ax=ax)
-        st.subheader(descricao)
-        ax.set_title('Evolução dos Valores ao Longo do Tempo')
-        plt.savefig('atual.png')  # Salva o gráfico
+        uploaded_file = st.file_uploader("Escolha um arquivo XLS", type="xlsx")
 
-        # Exibe a imagem salva
-        st.image('atual.png')
+        if uploaded_file is not None:
+            # Ler o arquivo XLS
+            df = pd.read_excel(uploaded_file)
+
+            # Filtra as colunas de data
+            date_columns = [col for col in df.columns if isinstance(col, datetime.datetime)]
+
+            # Filtra as colunas de data
+            date_columns = [col for col in df.columns if isinstance(col, datetime.datetime)]
+
+            # Converte o DataFrame para o formato longo (long format) para reorganizar as colunas de data
+            df_melted = df.melt(id_vars=[col for col in df.columns if col not in date_columns],
+                    value_vars=date_columns,
+                    var_name='mes-ano', value_name='valor')
+
+            # Convert 'mes-ano' column to datetime objects
+            df_melted['mes-ano'] = pd.to_datetime(df_melted['mes-ano'])
+
+            # Now you can use .dt.strftime
+            df_melted['mes-ano'] = df_melted['mes-ano'].dt.strftime('%Y-%m')
+
+            df_melted.dropna(inplace=True)
+
+            descricoes = df_melted['Descrição'].to_list()
+            codigos    = df_melted['Código'].to_list()
+            #st.write('Criar dicionario descricao:codigo')
+            # Cria o dicionário
+            descricao_para_codigo = dict(zip(descricoes, codigos))
+    
+            st.markdown("### Escolha um produto / Descrição")
+            descricao = st.selectbox('Descricao',descricoes, label_visibility = 'hidden')
+            st.write('Código:', descricao_para_codigo[descricao])
         
-        st.markdown("### Próximos 12 meses")
-        algoritmo = st.radio("Método  ",['Prophet', 'Xgboost',  'Ambos'], 
+            #symbol, description,forecast,model = predict3(option)
+            temp = df_melted.loc[df_melted['Descrição']== descricao]
+            st.write("Quantidade de Vendas:", temp.shape[0])
+            st.table(temp)
+            # Cria o gráfico e salva como 'atual.png'
+            fig, ax = plt.subplots()
+            temp.plot(x='mes-ano', y='valor', ax=ax)
+            st.subheader(descricao)
+            ax.set_title('Evolução dos Valores ao Longo do Tempo')
+            plt.savefig('atual.png')  # Salva o gráfico
+
+            # Exibe a imagem salva
+            st.image('atual.png')
+        
+            st.markdown("### Próximos 12 meses")
+            algoritmo = st.radio("Método  ",['Prophet', 'Xgboost',  'Arima'], 
         captions=[
         "rápido",
         "demorado",
-        "processa ambos métodos",
+        "Auto_arima",
     ], horizontal = True)
-        intervalo = 12
+            intervalo = 12
         
-        if st.button("Executar a previsão"):
-            try:
-               #symbol, description,forecast,model = predict2(option)
-               #save_plot(symbol, description,forecast,model)
-               with st.spinner('Aguarde o processamento...treinamento do modelo e plot do gráfico'):
+            if algoritmo == 'Prophet':
+                sazonality = st.radio("Considerar SAZONALIDADE  ",[True, False], horizontal = True)
+        
+            if st.button("Executar a previsão"):
+                try:
+                   #symbol, description,forecast,model = predict2(option)
+                   #save_plot(symbol, description,forecast,model)
+                   with st.spinner('Aguarde o processamento...treinamento do modelo e plot do gráfico'):
                
-                   if algoritmo == 'Prophet':
+                       if algoritmo == 'Prophet':
+                                     
+                           forecast,model, df = predict3(temp, intervalo, sazonality)
+                           st.markdown('### Prophet')
+                       
+                           st.table(forecast)
+                       
+                           save_plot2(df, descricao, forecast,model, intervalo)
                    
-                       forecast,model, df = predict3(temp, intervalo)
-                       st.markdown('### Prophet')
+                       elif algoritmo == 'Xgboost':
                        
-                       st.table(forecast)
-                       
-                       save_plot2(df, descricao, forecast,model, intervalo)
+                           st.markdown('### Xgboost')
+                           # Training model
+                           #st.write('Training xgboost')
+                           df_xgb, model = training_xgboost(temp)
                    
-                   elif algoritmo == 'Xgboost':
+                           #st.write(model)
                        
-                       st.markdown('### Xgboost')
+                           # Exemplo de uso para prever os próximos 12 meses
+                           predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
+                       
+                           st.table(predicoes_12_meses)
+                       
+                           plot_xgboost(df_xgb, predicoes_12_meses)
+                       else:
+                       #forecast,model, df = predict3(temp, intervalo)
+                       #st.markdown('### Prophet')
+                       #save_plot2(df, descricao, forecast,model, intervalo)
+                       
+                       #st.markdown('### Xgboost')
                        # Training model
                        #st.write('Training xgboost')
-                       df_xgb, model = training_xgboost(temp)
-                   
-                       #st.write(model)
-                       
-                       # Exemplo de uso para prever os próximos 12 meses
-                       predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
-                       
-                       st.table(predicoes_12_meses)
-                       
-                       plot_xgboost(df_xgb, predicoes_12_meses)
-                   else:
-                       forecast,model, df = predict3(temp, intervalo)
-                       st.markdown('### Prophet')
-                       save_plot2(df, descricao, forecast,model, intervalo)
-                       
-                       st.markdown('### Xgboost')
-                       # Training model
-                       #st.write('Training xgboost')
-                       df_xgb, model = training_xgboost(temp)
+                       #df_xgb, model = training_xgboost(temp)
                    
                        #st.write(model)
                        #st.table(df_xgb)
                        # Exemplo de uso para prever os próximos 12 meses
-                       predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
-                       plot_xgboost(df_xgb, predicoes_12_meses)
+                       #predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
+                       #plot_xgboost(df_xgb, predicoes_12_meses)
+                       # Inicializar o Auto-ARIMA
+                           st.markdown('### Arima')
+                           # Training model
+                           df = temp[['mes-ano','valor']]
+                           df['mes-ano'] = pd.to_datetime(temp['mes-ano'])
                        
+                           df.set_index('mes-ano', inplace=True)
+                       
+                      
+                           model = pm.auto_arima(df['valor'], seasonal=True, m=3, trace=True, error_action='ignore', suppress_warnings=True)
+                           
+                           
+                           # Fazer previsões para os próximos 12 meses
+                           n_periods = 12
+                           forecast, conf_int = model.predict(n_periods=n_periods, return_conf_int=True)
+
+                           # Criar um DataFrame com os valores previstos
+                           future_dates = pd.date_range(df.index[-1] + pd.DateOffset(months=1), periods=n_periods, freq='MS')
+                           forecast_df = pd.DataFrame({'Previsão': forecast}, index=future_dates)
+                       
+                           st.table(forecast_df)
+                           plt.figure(figsize=(10, 6))
+                           plt.plot(df.index, df['valor'], label='Valores Reais')
+                           plt.plot(forecast_df.index, forecast_df['Previsão'], label='Previsão Auto-ARIMA', color='orange')
+                           plt.fill_between(forecast_df.index, conf_int[:, 0], conf_int[:, 1], color='pink', alpha=0.3, label='Intervalo de Confiança')
+                           plt.legend()
+                           plt.title('Previsão de Vendas - Auto-ARIMA')
+                           #plt.xlabel('Data')
+                           #plt.ylabel('Vendas')
+                           plt.savefig("arima.png")
+                           st.image('arima.png')
                        
                                       
-            except:
-               st.write("Error descriçao: "+descricao)
-               st.error('Checar.', icon="🚨")
+                except:
+                   st.write("Error descriçao: "+descricao)
+                   st.error('Checar.', icon="🚨")
  
          
     else:
