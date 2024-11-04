@@ -22,6 +22,7 @@ import numpy as np
 #np.float_ = np.float64
 
 
+import openpyxl
 file = 'Consumo x Previsão.xlsx'
 df = pd.read_excel(file)
 
