@@ -327,7 +327,7 @@ def main():
         st.image('atual.png')
         
         st.markdown("### Próximos 12 meses")
-        algoritmo = st.radio("Método  ",['Prophet', 'Xgboost'], horizontal = True)
+        algoritmo = st.radio("Método  ",['Prophet', 'Xgboost',  'Ambos'], horizontal = True)
         intervalo = 12
         
         if st.button("Executar a previsão"):
@@ -341,7 +341,8 @@ def main():
                        forecast,model, df = predict3(temp, intervalo)
                        st.markdown('### Prophet')
                        save_plot2(df, descricao, forecast,model, intervalo)
-                   else:
+                   
+                   elif algoritmo == 'Xgboost':
                        
                        st.markdown('### Xgboost')
                        # Training model
@@ -353,6 +354,24 @@ def main():
                        # Exemplo de uso para prever os próximos 12 meses
                        predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
                        plot_xgboost(df_xgb, predicoes_12_meses)
+                 else:
+                       forecast,model, df = predict3(temp, intervalo)
+                       st.markdown('### Prophet')
+                       save_plot2(df, descricao, forecast,model, intervalo)
+                       
+                       st.markdown('### Xgboost')
+                       # Training model
+                       #st.write('Training xgboost')
+                       df_xgb, model = training_xgboost(temp)
+                   
+                       #st.write(model)
+                       #st.table(df_xgb)
+                       # Exemplo de uso para prever os próximos 12 meses
+                       predicoes_12_meses = forecast_xgboost(model, df_xgb, steps=12)
+                       plot_xgboost(df_xgb, predicoes_12_meses)
+                       
+                       
+                                      
             except:
                st.write("Error descriçao: "+descricao)
                st.error('Checar.', icon="🚨")
