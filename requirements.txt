@@ -6,3 +6,4 @@ prophet==1.1.2
 holidays==0.24
 setuptools
 numpy==1.26.4
+xgboost==2.1.2
