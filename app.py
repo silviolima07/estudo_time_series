@@ -339,7 +339,7 @@ def main():
             try:
                #symbol, description,forecast,model = predict2(option)
                #save_plot(symbol, description,forecast,model)
-               with st.spinner('Aguarde o processamento...'):
+               with st.spinner('Aguarde o processamento...treinamento do modelo e plot do gráfico'):
                
                    if algoritmo == 'Prophet':
                    
