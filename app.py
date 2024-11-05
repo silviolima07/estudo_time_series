@@ -341,7 +341,52 @@ def main():
             #symbol, description,forecast,model = predict3(option)
             temp = df_melted.loc[df_melted['Descrição']== descricao]
             st.write("Quantidade de Vendas:", temp.shape[0])
+            
+            st.markdown("### Tabela Original desse produto")
             st.table(temp)
+            
+            # Filtrar linhas com valor 0 e negativo
+            
+            
+            
+            temp_fil_maior_zero = temp.loc[temp.valor >0]
+            temp_fil_maior_igual_zero = temp.loc[temp.valor>=0]
+            
+            st.markdown("#### Filtrar valores negativos e zero ou apenas valores abaixo de zero")
+            filtro_zero = st.radio(" ",['Original', 'Valores a partir do zero', 'Valor acima de zero'], horizontal = True, label_visibility='hidden')
+            
+            if filtro_zero == 'Valores a partir do zero':
+                temp = temp_fil_maior_igual_zero
+                st.markdown("### Tabela filtrada - valores >= zero")
+                st.write("Quantidade de Vendas:", temp_fil_maior_igual_zero.shape[0])
+                st.table(temp_fil_maior_igual_zero)
+                
+            elif filtro_zero == 'Valor acima de zero':
+                temp = temp_fil_maior_zero
+                st.markdown("### Tabela filtrada - valores > zero")
+                st.write("Quantidade de Vendas:", temp_fil_maior_zero.shape[0])
+                st.table(temp_fil_maior_zero)
+            else:
+                st.markdown('### Tabela original')
+                st.write("Quantidade de Vendas:", temp.shape[0])
+                st.table(temp)
+                             
+              
+            
+            #st.markdown("### Tabela filtrada")
+            #st.markdown("##### - Removidos valores 0 e negativos")
+            #st.write("Quantidade de Vendas:", temp_fil_maior_zero.shape[0])
+            #st.table(temp_fil_maior_zero)
+            
+            
+            #filtro = st.radio("Original / Filtrada",['Original', 'Filtrada'], horizontal = True)
+            
+            #if filtro == 'Filtrada':
+            #    temp = temp_fil_maior_zero
+            #    st.markdown("Tabela filtrada")
+            #else:
+            #    st.markdown("Tabela original")            
+            
             # Cria o gráfico e salva como 'atual.png'
             fig, ax = plt.subplots()
             temp.plot(x='mes-ano', y='valor', ax=ax)
