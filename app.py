@@ -358,14 +358,14 @@ def main():
             if filtro_zero == 'Valores a partir do zero':
                 temp = temp_fil_maior_igual_zero
                 st.markdown("### Tabela filtrada - valores >= zero")
-                st.write("Quantidade de Vendas:", temp_fil_maior_igual_zero.shape[0])
-                st.table(temp_fil_maior_igual_zero)
+                st.write("Quantidade de Vendas:", temp.shape[0])
+                st.table(temp)
                 
             elif filtro_zero == 'Valor acima de zero':
                 temp = temp_fil_maior_zero
                 st.markdown("### Tabela filtrada - valores > zero")
-                st.write("Quantidade de Vendas:", temp_fil_maior_zero.shape[0])
-                st.table(temp_fil_maior_zero)
+                st.write("Quantidade de Vendas:", temp[0])
+                st.table(temp)
             else:
                 st.markdown('### Tabela original')
                 st.write("Quantidade de Vendas:", temp.shape[0])
@@ -391,6 +391,7 @@ def main():
             fig, ax = plt.subplots()
             temp.plot(x='mes-ano', y='valor', ax=ax)
             st.subheader(descricao)
+            st.write("Qtd:", temp.shape[0])
             ax.set_title('Evolução dos Valores ao Longo do Tempo')
             plt.savefig('atual.png')  # Salva o gráfico
 
