@@ -95,8 +95,8 @@ def forecast_xgboost(model, df, steps=12):
 
 def training_xgboost(df):
     # Prepara o dataset
-    df['mes'] = pd.to_datetime(df['mes-ano']).dt.month
-    df['ano'] = pd.to_datetime(df['mes-ano']).dt.year
+    df['mes'] = pd.to_datetime(df['ano-mes']).dt.month
+    df['ano'] = pd.to_datetime(df['ano-mes']).dt.year
 
     # Criando lag features para capturar valores passados
     df['valor_lag1'] = df['valor'].shift(1)
@@ -138,7 +138,7 @@ def plot_xgboost(df, predictions):
     #st.subheader('plot_xgboost')
     #st.table(df)
     
-    df['mes-ano'] = pd.to_datetime(df['mes-ano'], format='%Y-%m', errors='coerce')
+    df['ano-mes'] = pd.to_datetime(df['ano-mes'], format='%Y-%m', errors='coerce')
     # Extraindo previsões para 3, 6, 9 e 12 meses
     #model = training_xgboost(df)
     # Exemplo de uso para prever os próximos 12 meses
@@ -151,12 +151,12 @@ def plot_xgboost(df, predictions):
     previsao_12_meses = predicoes_12_meses[11] # índice 11 para o décimo segundo mês
 
     # Obtendo a última data do DataFrame
-    ultima_data = df['mes-ano'].iloc[-1]
+    ultima_data = df['ano-mes'].iloc[-1]
 
     print('Ultima data:',ultima_data)
     # Criando um DataFrame para as previsões
     previsao_data = {
-    'mes-ano': [
+    'ano-mes': [
         ultima_data + pd.DateOffset(months=1),
         ultima_data + pd.DateOffset(months=3),
         ultima_data + pd.DateOffset(months=6),
@@ -180,7 +180,7 @@ def plot_xgboost(df, predictions):
     #df = pd.concat([df, df_previsao], ignore_index=True)
 
     # Drop rows with invalid dates (NaT)
-    df = df.dropna(subset=['mes-ano'])
+    df = df.dropna(subset=['ano-mes'])
     #st.table(df)
 
     # Exibindo o DataFrame atualizado
@@ -189,9 +189,9 @@ def plot_xgboost(df, predictions):
 
     # Plotando os valores históricos e as previsões
     plt.figure(figsize=(12, 6))
-    plt.plot(df['mes-ano'], df['valor'], label='Valores Atuais', color='blue', marker='o')
+    plt.plot(df['ano-mes'], df['valor'], label='Valores Atuais', color='blue', marker='o')
     plt.axvline(x=ultima_data, color='green', linestyle='--', label='Início das Previsões')
-    plt.plot(df_previsao['mes-ano'].iloc[-5:], df_previsao['valor'].iloc[-5:], color='red', label='Previsões', marker='o')
+    plt.plot(df_previsao['ano-mes'].iloc[-5:], df_previsao['valor'].iloc[-5:], color='red', label='Previsões', marker='o')
     plt.title('Valores Atuais e Previsões para Próximos 1, 3, 6, 9 e 12 Meses')
     plt.xlabel('Data')
     plt.ylabel('Valor')
@@ -247,7 +247,7 @@ def save_plot2(df, descricao, forecast,model, intervalo):
 
 def predict3(temp, intervalo, sazonality):
   df = pd.DataFrame()
-  df['ds'] = pd.to_datetime(temp['mes-ano'])  # Coluna de datas mensais
+  df['ds'] = pd.to_datetime(temp['ano-mes'])  # Coluna de datas mensais
   df['y'] = temp['valor']  # Coluna de valores
   df = df.sort_values(by='ds')
  
@@ -318,13 +318,13 @@ def main():
             # Converte o DataFrame para o formato longo (long format) para reorganizar as colunas de data
             df_melted = df.melt(id_vars=[col for col in df.columns if col not in date_columns],
                     value_vars=date_columns,
-                    var_name='mes-ano', value_name='valor')
+                    var_name='ano-mes', value_name='valor')
 
             # Convert 'mes-ano' column to datetime objects
-            df_melted['mes-ano'] = pd.to_datetime(df_melted['mes-ano'])
+            df_melted['ano-mes'] = pd.to_datetime(df_melted['ano-mes'])
 
             # Now you can use .dt.strftime
-            df_melted['mes-ano'] = df_melted['mes-ano'].dt.strftime('%Y-%m')
+            df_melted['ano-mes'] = df_melted['ano-mes'].dt.strftime('%Y-%m')
 
             df_melted.dropna(inplace=True)
 
@@ -386,13 +386,24 @@ def main():
             #    st.markdown("Tabela filtrada")
             #else:
             #    st.markdown("Tabela original")            
-            
+            #df['data'] = pd.to_datetime(temp['mes-ano'], format='%Y-%m')
+            #df = df.sort_values(by='data')
+            #df['valor'] = temp['mes-ano']
+            # Plotar o gráfico
+            #plt.plot(df['data'], df['valor'])
+            #plt.xlabel('Data')
+            plt.ylabel('Valor')
+            #plt.title('Exemplo de Gráfico com Datas Ordenadas')
+            #plt.xticks(rotation=45)  # Rotacionar para facilitar a leitura das datas
+            #plt.show()
             # Cria o gráfico e salva como 'atual.png'
             fig, ax = plt.subplots()
-            temp.plot(x='mes-ano', y='valor', ax=ax)
+            temp = temp.sort_values(by='ano-mes')
+            temp.plot(x='ano-mes', y='valor', ax=ax)
             st.subheader(descricao)
             st.write("Qtd:", temp.shape[0])
-            ax.set_title('Evolução dos Valores ao Longo do Tempo')
+            #ax.set_title('Evolução dos Valores ao Longo do Tempo')
+            
             plt.savefig('atual.png')  # Salva o gráfico
 
             # Exibe a imagem salva
@@ -458,10 +469,10 @@ def main():
                        # Inicializar o Auto-ARIMA
                            st.markdown('### Arima')
                            # Training model
-                           df = temp[['mes-ano','valor']]
-                           df['mes-ano'] = pd.to_datetime(temp['mes-ano'])
+                           df = temp[['ano-mes','valor']]
+                           df['ano-mes'] = pd.to_datetime(temp['ano-mes'])
                        
-                           df.set_index('mes-ano', inplace=True)
+                           df.set_index('ano-mes', inplace=True)
                        
                       
                            model = pm.auto_arima(df['valor'], seasonal=True, m=3, trace=True, error_action='ignore', suppress_warnings=True)
