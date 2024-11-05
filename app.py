@@ -364,7 +364,7 @@ def main():
             elif filtro_zero == 'Valor acima de zero':
                 temp = temp_fil_maior_zero
                 st.markdown("### Tabela filtrada - valores > zero")
-                st.write("Quantidade de Vendas:", temp[0])
+                st.write("Quantidade de Vendas:", temp.shape[0])
                 st.table(temp)
             else:
                 st.markdown('### Tabela original')
